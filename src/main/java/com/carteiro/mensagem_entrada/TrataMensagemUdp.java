@@ -1,23 +1,50 @@
 package com.carteiro.mensagem_entrada;
 
-
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
+import com.carteiro.protos.JogadorOuterClass.*;
+import com.google.protobuf.Duration;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageHeaders;
 
+import java.io.FileOutputStream;
 import java.time.Instant;
 import java.util.Date;
 
 public class TrataMensagemUdp {
 
-    public void handleMessage(Message<String> message) {
+    public void handleMessage(Message<byte[]> message) {
+//        Jogador jogador = Jogador.newBuilder()
+//                .setId(13)
+//                .setRegiaoDoServidor("Brazil")
+//                .setVelocidade(15.5f)
+//                .setPosicao(2)
+//                .setTempoDeCorrida(Duration.newBuilder().setSeconds(120).setNanos(5465465).build())
+//                .setPistaDeCorrida(Jogador.PistaDaCorrida.INTERLAGOS)
+//                .setLocalizacao(Localizacao.newBuilder().setLatitude(1).setLongitude(1).setAltitude(2).build())
+//                .setCarro(Jogador.Carro.newBuilder()
+//                        .setEstadoDoCarro(0.8f)
+//                        .setCor(Color.newBuilder().setRed(1).setBlue(0).setGreen(1).setAlpha(1).build())
+//                        .setModeloDoCarro(Jogador.Carro.ModeloCarro.FUSCA)
+//                )
+//                .build();
+//
+//        try (FileOutputStream output = new FileOutputStream("jogador_message.bin")) {
+//            jogador.writeTo(output);
+//            System.out.println("Jogador message written to jogador_message.bin");
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
+
         // Process the incoming UDP message
-        Instant now = Instant.now();
-        String payload = message.getPayload();
+        byte[] payload = message.getPayload();
         MessageHeaders mh = message.getHeaders();
-        Date date = new Date((Long)mh.get("timestamp"));
-        final JsonObject json = new JsonParser().parse(payload).getAsJsonObject();
-        System.out.println("Received UDP message: " + payload);
+        //Date date = new Date((Long) mh.get("timestamp"));
+        try {
+            Jogador jogador = Jogador.parseFrom(payload);
+            Instant now = Instant.now();
+            System.out.println("Latência: " + now.minusMillis((Long)mh.get("timestamp")));
+            System.out.println(jogador.toString());
+        }catch (Exception e){
+            System.out.println("Erro no parsing");
+        }
     }
 }
