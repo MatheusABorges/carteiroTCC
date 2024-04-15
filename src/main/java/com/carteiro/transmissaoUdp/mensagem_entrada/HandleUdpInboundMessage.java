@@ -1,15 +1,12 @@
-package com.carteiro.mensagem_entrada;
+package com.carteiro.transmissaoUdp.mensagem_entrada;
 
 import com.carteiro.protos.JogadorOuterClass.*;
-import com.google.protobuf.Duration;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageHeaders;
 
-import java.io.FileOutputStream;
 import java.time.Instant;
-import java.util.Date;
 
-public class TrataMensagemUdp {
+public class HandleUdpInboundMessage {
 
     public void handleMessage(Message<byte[]> message) {
 //        Jogador jogador = Jogador.newBuilder()
@@ -33,7 +30,6 @@ public class TrataMensagemUdp {
 //        } catch (Exception e) {
 //            e.printStackTrace();
 //        }
-
         // Process the incoming UDP message
         byte[] payload = message.getPayload();
         MessageHeaders mh = message.getHeaders();
@@ -44,7 +40,8 @@ public class TrataMensagemUdp {
             System.out.println("Latência: " + now.minusMillis((Long)mh.get("timestamp")));
             System.out.println(jogador.toString());
         }catch (Exception e){
-            System.out.println("Erro no parsing");
+            //System.out.println("Erro no parsing");
+            System.out.println(new String(payload));
         }
     }
 }

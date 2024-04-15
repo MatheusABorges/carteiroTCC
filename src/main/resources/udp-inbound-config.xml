@@ -9,18 +9,14 @@
            http://www.springframework.org/schema/integration/ip/spring-integration-ip.xsd"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
 
+    <!-- Inbound server definition -->
     <int-ip:udp-inbound-channel-adapter
             id="udpInboundAdapter"
             channel="udpInboundChannel"
             port="9876"
     />
-
-
-    <int:channel id="udpInboundChannel" />
-
-    <int:service-activator input-channel="udpInboundChannel" ref="udpMessageHandler" method="handleMessage" />
-
-    <!-- Define your message handler bean -->
-    <bean id="udpMessageHandler" class="com.carteiro.mensagem_entrada.TrataMensagemUdp" />
+    <int:channel id="udpInboundChannel"/>
+    <int:service-activator input-channel="udpInboundChannel" ref="udpMessageHandler" method="handleMessage"/>
+    <bean id="udpMessageHandler" class="com.carteiro.transmissaoUdp.mensagem_entrada.HandleUdpInboundMessage"/>
 
 </beans>
