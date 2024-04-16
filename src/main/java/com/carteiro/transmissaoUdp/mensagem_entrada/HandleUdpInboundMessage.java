@@ -1,14 +1,17 @@
 package com.carteiro.transmissaoUdp.mensagem_entrada;
 
 import com.carteiro.protos.JogadorOuterClass.*;
+import com.carteiro.protos.MessageWrapperOuterClass.*;
+import com.google.protobuf.Duration;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageHeaders;
 
+import java.io.FileOutputStream;
 import java.time.Instant;
 
 public class HandleUdpInboundMessage {
 
-    public void handleMessage(Message<byte[]> message) {
+    public void handleMessage(byte[] message) {
 //        Jogador jogador = Jogador.newBuilder()
 //                .setId(13)
 //                .setRegiaoDoServidor("Brazil")
@@ -24,24 +27,31 @@ public class HandleUdpInboundMessage {
 //                )
 //                .build();
 //
-//        try (FileOutputStream output = new FileOutputStream("jogador_message.bin")) {
-//            jogador.writeTo(output);
+//        MessageWrapper jogadorMessage = MessageWrapper.newBuilder()
+//                .setData(jogador.toByteString())
+//                .setType("JOGADOR")
+//                .build();
+//        try (FileOutputStream output = new FileOutputStream("jogador_message_wrapped.bin")) {
+//            jogadorMessage.writeTo(output);
 //            System.out.println("Jogador message written to jogador_message.bin");
 //        } catch (Exception e) {
 //            e.printStackTrace();
 //        }
+
+
         // Process the incoming UDP message
-        byte[] payload = message.getPayload();
-        MessageHeaders mh = message.getHeaders();
-        //Date date = new Date((Long) mh.get("timestamp"));
         try {
-            Jogador jogador = Jogador.parseFrom(payload);
-            Instant now = Instant.now();
-            System.out.println("Latência: " + now.minusMillis((Long)mh.get("timestamp")));
+            MessageWrapper jogadorMessage = MessageWrapper.parseFrom(message);
+            System.out.println(jogadorMessage.getType());
+            Jogador jogador = null;
+            switch (jogadorMessage.getType()){
+                case "JOGADOR": jogador = Jogador.parseFrom(jogadorMessage.getData());break;
+                default: System.out.println("tipo de mensagem não definido");
+            }
             System.out.println(jogador.toString());
         }catch (Exception e){
             //System.out.println("Erro no parsing");
-            System.out.println(new String(payload));
+            System.out.println(new String(message));
         }
     }
 }

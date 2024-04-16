@@ -19,22 +19,26 @@ message Transacao{
 
 
   enum TipoEstabelecimento{
-    AUTOMOBILISTICO = 0;
+    NULL = 0;
     SAUDE = 1;
     RURAL = 2;
     ALIMENTACAO = 3;
     METALURGIA = 4;
     TECNOLOGIA = 5;
     ENERGIA = 6;
+    AUTOMOBILISTICO = 7;
+
 
   }
 
   enum TipoTransacao{
-    CREDITO = 0;
-    DEBITO = 1;
-    VOUCHER = 2;
+    NULO = 0;
+    CREDITO = 1;
+    DEBITO = 2;
+    VOUCHER = 3;
   }
 
   TipoEstabelecimento tipo_estabelecimento = 7;
   TipoTransacao tipo_transacao = 8;
+  Cartao cartao = 9;
 }
