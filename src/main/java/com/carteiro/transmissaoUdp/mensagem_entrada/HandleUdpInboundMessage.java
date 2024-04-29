@@ -12,6 +12,7 @@ import com.google.protobuf.Duration;
 import com.google.protobuf.GeneratedMessageV3;
 import com.google.protobuf.InvalidProtocolBufferException;
 import org.springframework.expression.spel.support.StandardEvaluationContext;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 
 import java.io.FileOutputStream;
@@ -28,6 +29,7 @@ public class HandleUdpInboundMessage {
         udpOutboundMessageHandler = new UdpOutboundMessageHandler();
     }
 
+    @Async
     public void handleMessage(byte[] rawMessage) {
 //        Jogador jogador = Jogador.newBuilder()
 //                .setId(13)

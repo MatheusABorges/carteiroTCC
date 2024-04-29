@@ -1,6 +1,9 @@
 syntax = "proto3";
+import "google/protobuf/timestamp.proto";
 
 message MessageWrapper {
   string type = 1;
   bytes data = 2;
+  google.protobuf.Timestamp timestamp = 3;
+  string id = 4;
 }
