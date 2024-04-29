@@ -1,6 +1,8 @@
 package com.carteiro.transmissaoUdp.mensagem_saida;
 
 
+import org.springframework.stereotype.Component;
+
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;

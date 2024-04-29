@@ -5,12 +5,14 @@ public class SubscriptionDTO {
     private int port;
     private String textFilter;
     private double ratio;
+    private String messageType;
 
-    public SubscriptionDTO(String ip, int port, String textFilter, double ratio){
+    public SubscriptionDTO(String ip, int port, String textFilter, double ratio, String messageType){
         this.ip = ip;
         this.port = port;
         this.textFilter = textFilter;
         this.ratio = ratio;
+        this.messageType = messageType;
     }
 
     public String getIp() {
@@ -43,5 +45,13 @@ public class SubscriptionDTO {
 
     public void setRatio(double ratio) {
         this.ratio = ratio;
+    }
+
+    public String getMessageType() {
+        return messageType;
+    }
+
+    public void setMessageType(String messageType) {
+        this.messageType = messageType;
     }
 }
