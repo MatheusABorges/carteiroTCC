@@ -1,10 +1,8 @@
 package com.carteiro.services;
 
 import com.carteiro.models.Subscription;
-import com.carteiro.protos.JogadorOuterClass;
 import com.carteiro.transmissaoUdp.mensagem_saida.UdpOutboundMessageHandler;
 import com.google.protobuf.ByteString;
-import com.google.protobuf.Duration;
 import com.google.protobuf.GeneratedMessageV3;
 import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Value;
@@ -20,6 +18,8 @@ public class UdpSubscriptionService {
     private static final ConcurrentHashMap<UUID, Subscription> subscriptionMap = new ConcurrentHashMap<>();
 
     private static Map<String, Method> parseMap;
+
+    private static final ConcurrentHashMap<UUID, Integer> periodMap = new ConcurrentHashMap<>();
 
     @Value("${protosTypes}")
     private List<String> protosNamingList;
@@ -55,6 +55,7 @@ public class UdpSubscriptionService {
 
     public void addClientConfiguration(UUID clientId, Subscription subscription) {
         subscriptionMap.put(clientId, subscription);
+        periodMap.put(clientId, 0);
         System.out.println(clientId);
     }
 
@@ -70,6 +71,12 @@ public class UdpSubscriptionService {
 
     public static Collection<Subscription> getAllSubscriptions(){
         return subscriptionMap.values();
+    }
+
+    public int getPeriodCounter(UUID subscriptionId) {
+        int currentPeriod = periodMap.get(subscriptionId);
+        periodMap.computeIfPresent(subscriptionId, (k, v) -> v+1);
+        return currentPeriod;
     }
 
     public Method getParseByName(String name) {

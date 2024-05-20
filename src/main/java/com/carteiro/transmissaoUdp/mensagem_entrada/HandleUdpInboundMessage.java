@@ -5,6 +5,7 @@ import com.carteiro.protos.JogadorOuterClass;
 import com.carteiro.protos.JogadorOuterClass.Jogador;
 import com.carteiro.protos.TransacaoOuterClass.Transacao;
 import com.carteiro.protos.MessageWrapperOuterClass.MessageWrapper;
+import java.util.concurrent.ThreadLocalRandom;
 
 import com.carteiro.services.UdpSubscriptionService;
 import com.carteiro.transmissaoUdp.mensagem_saida.UdpOutboundMessageHandler;
@@ -71,13 +72,27 @@ public class HandleUdpInboundMessage {
             StandardEvaluationContext context = new StandardEvaluationContext();
             UdpSubscriptionService.getAllSubscriptions().forEach(
                     subscription -> {
-                        context.setRootObject(message);
+                        Boolean shouldSend = true;
+                        //checks if the client is subscribed to this type of message
                         if(subscription.getMessageType().equals(outerMessage.getType())){
-                            var expValue = (Boolean)subscription.getContentFilter().getValue(context);
-                            if(expValue != null && expValue) {
-                                udpOutboundMessageHandler.sendMessage(rawMessage, subscription.getIp(), subscription.getPort(), "<ID PLACEHOLDER>", subscription.getId());
+                            //sampling
+                            if(subscription.getPeriod() != null) {
+                                if(udpSubscriptionService.getPeriodCounter(subscription.getId())%subscription.getPeriod() != 0){
+                                    shouldSend = false;
+                                }
+                            } else if(subscription.getFrequency() != null && ThreadLocalRandom.current().nextDouble() > subscription.getFrequency()) {
+                                shouldSend = false;
                             }
+                            //Content based filtering
+                            if(subscription.getContentFilter() != null && shouldSend) {
+                                context.setRootObject(message);
+                                shouldSend = (Boolean) subscription.getContentFilter().getValue(context);
+                            }
+                        }else {
+                            shouldSend = false;
                         }
+                        if(shouldSend != null && shouldSend)
+                            udpOutboundMessageHandler.sendMessage(rawMessage, subscription.getIp(), subscription.getPort(), "<ID PLACEHOLDER>", subscription.getId());
                     }
             );
 

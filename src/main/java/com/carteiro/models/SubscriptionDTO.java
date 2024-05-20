@@ -4,15 +4,17 @@ public class SubscriptionDTO {
     private String ip;
     private int port;
     private String textFilter;
-    private double ratio;
+    private Double frequency;
     private String messageType;
+    private Integer period;
 
-    public SubscriptionDTO(String ip, int port, String textFilter, double ratio, String messageType){
+    public SubscriptionDTO(String ip, int port, String textFilter, Double frequency, String messageType, int period){
         this.ip = ip;
         this.port = port;
         this.textFilter = textFilter;
-        this.ratio = ratio;
+        this.frequency = frequency;
         this.messageType = messageType;
+        this.period = period;
     }
 
     public String getIp() {
@@ -39,12 +41,12 @@ public class SubscriptionDTO {
         this.textFilter = textFilter;
     }
 
-    public double getRatio() {
-        return ratio;
+    public Double getFrequency() {
+        return frequency;
     }
 
-    public void setRatio(double ratio) {
-        this.ratio = ratio;
+    public void setFrequency(Double frequency) {
+        this.frequency = frequency;
     }
 
     public String getMessageType() {
@@ -53,5 +55,13 @@ public class SubscriptionDTO {
 
     public void setMessageType(String messageType) {
         this.messageType = messageType;
+    }
+
+    public Integer getPeriod() {
+        return period;
+    }
+
+    public void setPeriod(Integer period) {
+        this.period = period;
     }
 }

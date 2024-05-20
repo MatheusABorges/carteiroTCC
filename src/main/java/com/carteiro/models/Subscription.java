@@ -11,17 +11,19 @@ public class Subscription {
     private InetAddress ip;
     private int port;
     private Expression contentFilter;
-    private double ratio;
     private String messageType;
+    private Integer period;
+    private Double frequency;
 
     public Subscription(SubscriptionDTO subscriptionDTO, Expression expression){
         try {
             this.ip = InetAddress.getByName(subscriptionDTO.getIp());
             this.port = subscriptionDTO.getPort();
             this.contentFilter = expression;
-            this.ratio = subscriptionDTO.getRatio();
             this.id = UUID.randomUUID();
             this.messageType = subscriptionDTO.getMessageType();
+            this.period =  subscriptionDTO.getPeriod();
+            this.frequency = subscriptionDTO.getFrequency();
         } catch(Exception e){
             System.out.println("Could not instantiate subscription due to its IP address");
         }
@@ -51,14 +53,6 @@ public class Subscription {
         this.contentFilter = contentFilter;
     }
 
-    public double getRatio() {
-        return ratio;
-    }
-
-    public void setRatio(double ratio) {
-        this.ratio = ratio;
-    }
-
     public UUID getId() {
         return id;
     }
@@ -73,5 +67,21 @@ public class Subscription {
 
     public void setMessageType(String messageType) {
         this.messageType = messageType;
+    }
+
+    public Integer getPeriod() {
+        return period;
+    }
+
+    public void setPeriod(Integer period) {
+        this.period = period;
+    }
+
+    public Double getFrequency() {
+        return frequency;
+    }
+
+    public void setFrequency(Double frequency) {
+        this.frequency = frequency;
     }
 }

@@ -37,6 +37,9 @@ public class SubscriptionController {
         }catch (ParseException e){
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Given filter expression could not be parsed", e);
         }
+        if(data.getFrequency() != null && data.getFrequency().equals(0d)){
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Frequency cannot be equals to 0");
+        }
 
         Subscription subscription = new Subscription(data, expr);
         udpSubscriptionService.addClientConfiguration(subscription.getId(),subscription);
