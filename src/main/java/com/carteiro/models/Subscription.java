@@ -14,6 +14,7 @@ public class Subscription {
     private String messageType;
     private Integer period;
     private Double frequency;
+    private Long minTimeIntervalInNanoSecs;
 
     public Subscription(SubscriptionDTO subscriptionDTO, Expression expression){
         try {
@@ -24,6 +25,7 @@ public class Subscription {
             this.messageType = subscriptionDTO.getMessageType();
             this.period =  subscriptionDTO.getPeriod();
             this.frequency = subscriptionDTO.getFrequency();
+            this.minTimeIntervalInNanoSecs = subscriptionDTO.getMinTimeIntervalInMicroSecs()*1000;
         } catch(Exception e){
             System.out.println("Could not instantiate subscription due to its IP address");
         }
@@ -84,4 +86,8 @@ public class Subscription {
     public void setFrequency(Double frequency) {
         this.frequency = frequency;
     }
+
+    public Long getMinTimeIntervalInNanoSecs() { return minTimeIntervalInNanoSecs; }
+
+    public void setMinTimeIntervalInNanoSecs(Long minTimeIntervalInNanoSecs) { this.minTimeIntervalInNanoSecs = minTimeIntervalInNanoSecs; }
 }

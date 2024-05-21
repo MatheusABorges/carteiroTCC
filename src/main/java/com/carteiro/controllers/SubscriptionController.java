@@ -41,6 +41,11 @@ public class SubscriptionController {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Frequency cannot be equals to 0");
         }
 
+        if((data.getFrequency() != null || data.getPeriod() != null) && data.getMinTimeIntervalInMicroSecs() != null){
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Need to choose between relative and absolute frequency, cannot have both");
+        }
+
+
         Subscription subscription = new Subscription(data, expr);
         udpSubscriptionService.addClientConfiguration(subscription.getId(),subscription);
         return subscription.getId();

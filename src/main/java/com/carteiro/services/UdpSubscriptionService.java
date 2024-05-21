@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import java.lang.reflect.Method;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.time.Instant;
 
 @Service
 public class UdpSubscriptionService {
@@ -20,6 +21,8 @@ public class UdpSubscriptionService {
     private static Map<String, Method> parseMap;
 
     private static final ConcurrentHashMap<UUID, Integer> periodMap = new ConcurrentHashMap<>();
+
+    private static final ConcurrentHashMap<UUID, Instant> absoluteFrequencyMap = new ConcurrentHashMap<>();
 
     @Value("${protosTypes}")
     private List<String> protosNamingList;
@@ -55,7 +58,12 @@ public class UdpSubscriptionService {
 
     public void addClientConfiguration(UUID clientId, Subscription subscription) {
         subscriptionMap.put(clientId, subscription);
-        periodMap.put(clientId, 0);
+        if (subscription.getPeriod() != null || subscription.getFrequency() !=null ){
+            periodMap.put(clientId, 0);
+        }
+        if(subscription.getMinTimeIntervalInNanoSecs()!= null){
+            absoluteFrequencyMap.put(clientId,Instant.MIN);
+        }
         System.out.println(clientId);
     }
 
@@ -77,6 +85,14 @@ public class UdpSubscriptionService {
         int currentPeriod = periodMap.get(subscriptionId);
         periodMap.computeIfPresent(subscriptionId, (k, v) -> v+1);
         return currentPeriod;
+    }
+
+    public Instant getLastTimeClientReceived(UUID subscriptionId){
+        return absoluteFrequencyMap.get(subscriptionId);
+    }
+
+    public void setLastTimeClientReceived(UUID subscriptionId,Instant instant){
+        absoluteFrequencyMap.computeIfPresent(subscriptionId, (k,v) -> instant);
     }
 
     public Method getParseByName(String name) {

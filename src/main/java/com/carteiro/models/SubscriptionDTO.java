@@ -7,14 +7,16 @@ public class SubscriptionDTO {
     private Double frequency;
     private String messageType;
     private Integer period;
+    private Long minTimeIntervalInMicroSecs;
 
-    public SubscriptionDTO(String ip, int port, String textFilter, Double frequency, String messageType, int period){
+    public SubscriptionDTO(String ip, int port, String textFilter, Double frequency, String messageType, int period, Long minTimeIntervalInMicroSecs){
         this.ip = ip;
         this.port = port;
         this.textFilter = textFilter;
         this.frequency = frequency;
         this.messageType = messageType;
         this.period = period;
+        this.minTimeIntervalInMicroSecs = minTimeIntervalInMicroSecs;
     }
 
     public String getIp() {
@@ -64,4 +66,8 @@ public class SubscriptionDTO {
     public void setPeriod(Integer period) {
         this.period = period;
     }
+
+    public Long getMinTimeIntervalInMicroSecs() { return minTimeIntervalInMicroSecs;}
+
+    public void setMinTimeIntervalInMicroSecs(Long minTimeIntervalInMicroSecs) { this.minTimeIntervalInMicroSecs = minTimeIntervalInMicroSecs; }
 }
