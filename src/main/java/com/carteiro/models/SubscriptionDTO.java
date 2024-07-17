@@ -9,13 +9,13 @@ public class SubscriptionDTO {
     private Integer period;
     private Long minTimeIntervalInMicroSecs;
 
-    public SubscriptionDTO(String ip, int port, String textFilter, Double frequency, String messageType, int period, Long minTimeIntervalInMicroSecs){
+    public SubscriptionDTO(String ip, int port, String textFilter, Double frequency, String messageType, Integer period, Long minTimeIntervalInMicroSecs){
         this.ip = ip;
         this.port = port;
         this.textFilter = textFilter;
         this.frequency = frequency;
         this.messageType = messageType;
-        this.period = period;
+        this.period = period == null || period == 0 ? null : period;
         this.minTimeIntervalInMicroSecs = minTimeIntervalInMicroSecs;
     }
 

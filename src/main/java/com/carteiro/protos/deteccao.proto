@@ -1,7 +1,5 @@
 syntax = "proto3";
 
-import "google/protobuf/timestamp.proto";
-
 message Radar{
   int64 id_radar = 1;
   string localizacao = 2;
@@ -35,7 +33,7 @@ message Veiculo{
 
 message Deteccao{
   int64 id_deteccao = 1;
-  google.protobuf.Timestamp data_deteccao = 2;
+  uint64 data_deteccao = 2;
   Veiculo veiculo = 3;
   Radar radar = 4;
 }

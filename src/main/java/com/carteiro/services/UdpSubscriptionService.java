@@ -103,4 +103,10 @@ public class UdpSubscriptionService {
             return null;
         }
     }
+
+    public void deleteSubscription(UUID subscriptionId){
+        subscriptionMap.remove(subscriptionId);
+        periodMap.remove(subscriptionId);
+        absoluteFrequencyMap.remove(subscriptionId);
+    }
 }

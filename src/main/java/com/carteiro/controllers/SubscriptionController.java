@@ -33,7 +33,7 @@ public class SubscriptionController {
     public UUID receiveData(@RequestBody SubscriptionDTO data) {
         Expression expr;
         try {
-            expr = parser.parseExpression(data.getTextFilter());
+            expr = !data.getTextFilter().isBlank() ? parser.parseExpression(data.getTextFilter()) : null;
         }catch (ParseException e){
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Given filter expression could not be parsed", e);
         }
@@ -67,5 +67,11 @@ public class SubscriptionController {
     @ResponseStatus(HttpStatus.OK)
     public void sendMessageToEveryone(@RequestBody String message){
         udpSubscriptionService.sendMessageToEveryone(message.getBytes(),"Sample ID");
+    }
+
+    @DeleteMapping("/unsubscribe")
+    @ResponseStatus(HttpStatus.OK)
+    public void clearSubscriptionsData(@RequestBody String subscriptionId){
+        udpSubscriptionService.deleteSubscription(UUID.fromString(subscriptionId));
     }
 }
