@@ -11,6 +11,10 @@ java {
 	sourceCompatibility = '21'
 }
 
+bootJar {
+	archiveFileName = 'carteiro.jar'
+}
+
 repositories {
 	mavenCentral()
 }
