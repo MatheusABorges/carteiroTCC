@@ -69,9 +69,9 @@ public class SubscriptionController {
         udpSubscriptionService.sendMessageToEveryone(message.getBytes(),"Sample ID");
     }
 
-    @DeleteMapping("/unsubscribe")
+    @DeleteMapping("/unsubscribe/{subscriptionId}")
     @ResponseStatus(HttpStatus.OK)
-    public void clearSubscriptionsData(@RequestBody String subscriptionId){
+    public void clearSubscriptionsData(@PathVariable(value="subscriptionId") String subscriptionId){
         udpSubscriptionService.deleteSubscription(UUID.fromString(subscriptionId));
     }
 }
