@@ -1,22 +1,42 @@
 <beans xmlns="http://www.springframework.org/schema/beans"
        xmlns:int="http://www.springframework.org/schema/integration"
        xmlns:int-ip="http://www.springframework.org/schema/integration/ip"
+       xmlns:task="http://www.springframework.org/schema/task"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xsi:schemaLocation="http://www.springframework.org/schema/beans
            http://www.springframework.org/schema/beans/spring-beans.xsd
            http://www.springframework.org/schema/integration
            http://www.springframework.org/schema/integration/spring-integration.xsd
            http://www.springframework.org/schema/integration/ip
-           http://www.springframework.org/schema/integration/ip/spring-integration-ip.xsd"
-       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+           http://www.springframework.org/schema/integration/ip/spring-integration-ip.xsd
+           http://www.springframework.org/schema/task
+           http://www.springframework.org/schema/task/spring-task.xsd">
 
-    <!-- Inbound server definition -->
-    <int-ip:udp-inbound-channel-adapter
-            id="udpInboundAdapter"
-            channel="udpInboundChannel"
-            port="9876"
-    />
-    <int:channel id="udpInboundChannel"/>
-    <int:service-activator input-channel="udpInboundChannel" ref="udpMessageHandler" method="handleMessage"/>
-    <bean id="udpMessageHandler" class="com.carteiro.transmissaoUdp.mensagem_entrada.HandleUdpInboundMessage"/>
+<!--    &lt;!&ndash; Inbound server definition with reduced buffer size &ndash;&gt;-->
+<!--    <int-ip:udp-inbound-channel-adapter-->
+<!--            id="udpInboundAdapter"-->
+<!--            channel="udpInboundChannel"-->
+<!--            port="9876"-->
+<!--            receive-buffer-size="1536"-->
+<!--    />-->
+
+<!--    &lt;!&ndash; Executor configuration &ndash;&gt;-->
+<!--    <task:executor id="udpTaskExecutor" pool-size="50"/>-->
+
+<!--    &lt;!&ndash; Channel definition with executor &ndash;&gt;-->
+<!--    <int:channel id="udpInboundChannel">-->
+<!--        <int:dispatcher task-executor="udpTaskExecutor"/>-->
+<!--    </int:channel>-->
+
+<!--    &lt;!&ndash; Service activator &ndash;&gt;-->
+<!--    <int:service-activator input-channel="udpInboundChannel" ref="udpMessageHandler" method="handleMessage"/>-->
+
+<!--    &lt;!&ndash; Discard channel and handler for unprocessed messages &ndash;&gt;-->
+<!--    <int:channel id="discardChannel"/>-->
+<!--    <int:service-activator input-channel="discardChannel" ref="discardHandler" method="handle"/>-->
+
+<!--    &lt;!&ndash; Beans for message and discard handlers &ndash;&gt;-->
+<!--    <bean id="udpMessageHandler" class="com.carteiro.transmissaoUdp.mensagem_entrada.HandleUdpInboundMessage"/>-->
+<!--    <bean id="discardHandler" class="com.carteiro.transmissaoUdp.mensagem_entrada.DiscardHandler"/>-->
 
 </beans>

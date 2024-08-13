@@ -3,6 +3,7 @@ package com.carteiro.controllers;
 import com.carteiro.models.Subscription;
 import com.carteiro.models.SubscriptionDTO;
 import com.carteiro.services.UdpSubscriptionService;
+import com.carteiro.transmissaoUdp.mensagem_entrada.DiscardHandler;
 import org.springframework.expression.Expression;
 import org.springframework.expression.ParseException;
 import org.springframework.expression.spel.SpelCompilerMode;
@@ -62,6 +63,10 @@ public class SubscriptionController {
     public int getNumberOfSubscriptions(){
         return udpSubscriptionService.getAllSubscriptions().size();
     }
+
+    @GetMapping("/message_loss_count")
+    @ResponseStatus(HttpStatus.OK)
+    public int getMessageLossCount(){return DiscardHandler.getDiscardCount();}
 
     @PostMapping("/send_to_everyone")
     @ResponseStatus(HttpStatus.OK)

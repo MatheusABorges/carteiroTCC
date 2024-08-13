@@ -1,14 +1,19 @@
 package com.carteiro.services;
 
 import com.carteiro.models.Subscription;
+import com.carteiro.transmissaoUdp.mensagem_entrada.HandleUdpInboundMessage;
 import com.carteiro.transmissaoUdp.mensagem_saida.UdpOutboundMessageHandler;
 import com.google.protobuf.ByteString;
 import com.google.protobuf.GeneratedMessageV3;
 import jakarta.annotation.PostConstruct;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import java.io.ByteArrayInputStream;
 import java.lang.reflect.Method;
+import java.net.DatagramPacket;
+import java.net.DatagramSocket;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.time.Instant;
@@ -26,6 +31,8 @@ public class UdpSubscriptionService {
 
     @Value("${protosTypes}")
     private List<String> protosNamingList;
+
+
 
     //Inicia o map que guarda uma referência para a função de parse dos protos cujos nomes foram definidos na variável protosNamingList em application.properties
     @PostConstruct
@@ -55,6 +62,8 @@ public class UdpSubscriptionService {
         parseMap = Collections.unmodifiableMap(parseMap);
         protosNamingList = null;
     }
+
+
 
     public void addClientConfiguration(UUID clientId, Subscription subscription) {
         subscriptionMap.put(clientId, subscription);

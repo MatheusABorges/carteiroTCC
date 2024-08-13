@@ -2,6 +2,9 @@ package com.carteiro.transmissaoUdp.mensagem_entrada;
 
 import com.carteiro.protos.MessageWrapperOuterClass.MessageWrapper;
 
+import java.io.ByteArrayInputStream;
+import java.net.DatagramPacket;
+import java.net.DatagramSocket;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.concurrent.ThreadLocalRandom;
@@ -10,6 +13,7 @@ import com.carteiro.services.UdpSubscriptionService;
 import com.carteiro.transmissaoUdp.mensagem_saida.UdpOutboundMessageHandler;
 import com.google.protobuf.GeneratedMessageV3;
 import com.google.protobuf.InvalidProtocolBufferException;
+import jakarta.annotation.PostConstruct;
 import org.springframework.expression.spel.support.StandardEvaluationContext;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
@@ -26,6 +30,26 @@ public class HandleUdpInboundMessage {
         udpOutboundMessageHandler = new UdpOutboundMessageHandler();
     }
 
+    @PostConstruct
+    public void startReceiver() {
+        new Thread(() -> {
+            try (DatagramSocket socket = new DatagramSocket(9876)) {
+                byte[] buffer = new byte[1024];
+                while (true) {
+                    DatagramPacket packet = new DatagramPacket(buffer, buffer.length);
+                    socket.receive(packet);
+
+                    byte[] data = new byte[packet.getLength()];
+                    System.arraycopy(packet.getData(), packet.getOffset(), data, 0, packet.getLength());
+
+                    ByteArrayInputStream byteStream = new ByteArrayInputStream(packet.getData(), packet.getOffset(), packet.getLength());
+                    handleMessage(byteStream.readAllBytes());
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }).start();
+    }
     @Async
     public void handleMessage(byte[] rawMessage) {
 //        Jogador jogador = Jogador.newBuilder()
@@ -63,7 +87,7 @@ public class HandleUdpInboundMessage {
             if(parseMethod == null)
                 return;
 
-            GeneratedMessageV3 message = (GeneratedMessageV3)parseMethod.invoke(null, outerMessage.getData());
+            GeneratedMessageV3 message = null;//(GeneratedMessageV3)parseMethod.invoke(null, outerMessage.getData());
 
             StandardEvaluationContext context = new StandardEvaluationContext();
             UdpSubscriptionService.getAllSubscriptions().forEach(
