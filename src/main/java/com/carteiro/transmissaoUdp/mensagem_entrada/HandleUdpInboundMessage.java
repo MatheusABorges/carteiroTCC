@@ -1,5 +1,6 @@
 package com.carteiro.transmissaoUdp.mensagem_entrada;
 
+import com.carteiro.models.Subscription;
 import com.carteiro.protos.MessageWrapperOuterClass.MessageWrapper;
 
 import java.io.ByteArrayInputStream;
@@ -7,6 +8,8 @@ import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.time.Duration;
 import java.time.Instant;
+import java.util.Collection;
+import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 
 import com.carteiro.services.UdpSubscriptionService;
@@ -90,48 +93,93 @@ public class HandleUdpInboundMessage {
             GeneratedMessageV3 message = null;//(GeneratedMessageV3)parseMethod.invoke(null, outerMessage.getData());
 
             StandardEvaluationContext context = new StandardEvaluationContext();
-            UdpSubscriptionService.getAllSubscriptions().forEach(
-                    subscription -> {
-                        Boolean shouldSend = true;
-                        Boolean passedAbsoluteSampling = false;
-                        Instant currentTime = Instant.now();
-                        //checks if the client is subscribed to this type of message
-                        if(subscription.getMessageType().equals(outerMessage.getType())){
-                            //sampling
-                            if(subscription.getPeriod() != null) {
-                                if(udpSubscriptionService.getPeriodCounter(subscription.getId())%subscription.getPeriod() != 0){
-                                    shouldSend = false;
-                                }
-                            } else if(subscription.getFrequency() != null && ThreadLocalRandom.current().nextDouble() > subscription.getFrequency()) {
-                                shouldSend = false;
-                            }
-                            //Absolute frequency sampling
+//            UdpSubscriptionService.getAllSubscriptions().forEach(
+//                    subscription -> {
+//                        Boolean shouldSend = true;
+//                        Boolean passedAbsoluteSampling = false;
+//                        Instant currentTime = Instant.now();
+//                        //checks if the client is subscribed to this type of message
+//                        if(subscription.getMessageType().equals(outerMessage.getType())){
+//                            //sampling
+//                            if(subscription.getPeriod() != null) {
+//                                if(udpSubscriptionService.getPeriodCounter(subscription.getId())%subscription.getPeriod() != 0){
+//                                    shouldSend = false;
+//                                }
+//                            } else if(subscription.getFrequency() != null && ThreadLocalRandom.current().nextDouble() > subscription.getFrequency()) {
+//                                shouldSend = false;
+//                            }
+//                            //Absolute frequency sampling
+//
+//                            if (subscription.getMinTimeIntervalInNanoSecs()!= null){
+//                                long duration = Duration.between(udpSubscriptionService.getLastTimeClientReceived(subscription.getId()), currentTime).toNanos();
+//                                if(duration  < subscription.getMinTimeIntervalInNanoSecs()){
+//                                    shouldSend = false;
+//                                }
+//                                else {
+//                                    passedAbsoluteSampling = true;
+//                                }
+//                            }
+//                            //Content based filtering
+//                            if(subscription.getContentFilter() != null &&  shouldSend) {
+//                                context.setRootObject(message);
+//                                shouldSend = (Boolean) subscription.getContentFilter().getValue(context);
+//                            }
+//
+//                        }else {
+//                            shouldSend = false;
+//                        }
+//                        if(shouldSend != null && shouldSend) {
+//                            udpOutboundMessageHandler.sendMessage(rawMessage, subscription.getIp(), subscription.getPort(), "<ID PLACEHOLDER>", subscription.getId());
+//                            if (passedAbsoluteSampling)
+//                                udpSubscriptionService.setLastTimeClientReceived(subscription.getId(),currentTime);
+//                        }
+//                    }
+//            );
+            Collection<Subscription> subscriptions = UdpSubscriptionService.getAllSubscriptions();
+            for (Subscription subscription : subscriptions) {
+                Boolean shouldSend = true;
+                Boolean passedAbsoluteSampling = false;
+                Instant currentTime = Instant.now();
 
-                            if (subscription.getMinTimeIntervalInNanoSecs()!= null){
-                                long duration = Duration.between(udpSubscriptionService.getLastTimeClientReceived(subscription.getId()), currentTime).toNanos();
-                                if(duration  < subscription.getMinTimeIntervalInNanoSecs()){
-                                    shouldSend = false;
-                                }
-                                else {
-                                    passedAbsoluteSampling = true;
-                                }
-                            }
-                            //Content based filtering
-                            if(subscription.getContentFilter() != null &&  shouldSend) {
-                                context.setRootObject(message);
-                                shouldSend = (Boolean) subscription.getContentFilter().getValue(context);
-                            }
-
-                        }else {
+                // Checks if the client is subscribed to this type of message
+                if (subscription.getMessageType().equals(outerMessage.getType())) {
+                    // Sampling
+                    if (subscription.getPeriod() != null) {
+                        if (udpSubscriptionService.getPeriodCounter(subscription.getId()) % subscription.getPeriod() != 0) {
                             shouldSend = false;
                         }
-                        if(shouldSend != null && shouldSend) {
-                            udpOutboundMessageHandler.sendMessage(rawMessage, subscription.getIp(), subscription.getPort(), "<ID PLACEHOLDER>", subscription.getId());
-                            if (passedAbsoluteSampling)
-                                udpSubscriptionService.setLastTimeClientReceived(subscription.getId(),currentTime);
+                    } else if (subscription.getFrequency() != null && ThreadLocalRandom.current().nextDouble() > subscription.getFrequency()) {
+                        shouldSend = false;
+                    }
+
+                    // Absolute frequency sampling
+                    if (subscription.getMinTimeIntervalInNanoSecs() != null) {
+                        long duration = Duration.between(udpSubscriptionService.getLastTimeClientReceived(subscription.getId()), currentTime).toNanos();
+                        if (duration < subscription.getMinTimeIntervalInNanoSecs()) {
+                            shouldSend = false;
+                        } else {
+                            passedAbsoluteSampling = true;
                         }
                     }
-            );
+
+                    // Content-based filtering
+                    if (subscription.getContentFilter() != null && shouldSend) {
+                        message = (GeneratedMessageV3)parseMethod.invoke(null, outerMessage.getData());
+                        context.setRootObject(message);
+                        shouldSend = (Boolean) subscription.getContentFilter().getValue(context);
+                    }
+
+                } else {
+                    shouldSend = false;
+                }
+
+                if (shouldSend != null && shouldSend) {
+                    udpOutboundMessageHandler.sendMessage(rawMessage, subscription.getIp(), subscription.getPort(), "<ID PLACEHOLDER>", subscription.getId());
+                    if (passedAbsoluteSampling) {
+                        udpSubscriptionService.setLastTimeClientReceived(subscription.getId(), currentTime);
+                    }
+                }
+            }
 
         } catch(InvalidProtocolBufferException e){
             System.out.println("Message could not be parsed");
