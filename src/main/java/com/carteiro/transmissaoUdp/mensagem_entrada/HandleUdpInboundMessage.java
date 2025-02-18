@@ -164,7 +164,9 @@ public class HandleUdpInboundMessage {
 
                     // Content-based filtering
                     if (subscription.getContentFilter() != null && shouldSend) {
-                        message = (GeneratedMessageV3)parseMethod.invoke(null, outerMessage.getData());
+                        if(message != null){
+                            message = (GeneratedMessageV3)parseMethod.invoke(null, outerMessage.getData());
+                        }
                         context.setRootObject(message);
                         shouldSend = (Boolean) subscription.getContentFilter().getValue(context);
                     }
